@@ -1,0 +1,6 @@
+selenium
+argparse
+plain_logger
+python-dotenv
+redis
+schedule
