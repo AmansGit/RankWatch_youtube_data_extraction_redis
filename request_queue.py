@@ -10,20 +10,9 @@ args = parser.parse_args()
 def validating(link):
 	youtube_url = "https://www.youtube.com/watch?v="
 
-	# (?# pattern = r'^(https?\:\/\/)?(www\.youtube\.com)?(watch)?\?(v)')
-
 	flag = False
-	# print(link.split('=')[0])
-
-	# link = link.split('=')[0]
-
 	if link.startswith(youtube_url):
 		flag = True
-
-	# print(link)
-
-	# if(re.search(link, pattern)):
-	# 	flag = True
 
 	return flag
 
@@ -31,13 +20,15 @@ def validating(link):
 link = args.link
 isValid = True
 isValid = validating(args.link)
-print(isValid)
+
 if isValid:
 
 	try:		
 		
+		# starting connection to redis
 		redis = connection()
-		# print("redis: ", redis)
+		
+		# to push into redis db
 		redis.lpush(os.getenv('REDIS_YOUTUBE_VIDEO_LIST'), link)
 		logger.LogInfo("youtube link queued")
 	except Exception as e:

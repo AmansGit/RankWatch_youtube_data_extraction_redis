@@ -8,7 +8,11 @@ redis = connection()
 
 def save_data():
 	logger.LogInfo("Working...")
-	# details = redis.lpop(os.getenv('REDIS_YOUTUBE_VIDEO_DETAILS'))
+
+	# pop out the last data of redis. (like stack in data structure)
+	logger.LogInfo("Popping out last pushed data from redis")
+
+	# "REDIS_YOUTUBE_VIDEO_DETAILS" comes from .env 
 	details = redis.lpop(os.getenv('REDIS_YOUTUBE_VIDEO_DETAILS'))
 	fieldnames = []
 	# try:
@@ -17,43 +21,44 @@ def save_data():
 	if details:
 
 		details = details.decode('ascii')
+		
+		# convert string to python dictionary
 		details = json.loads(details)
 		
-		# print("loads:", details)
 		
 		len_details = details.keys()
-		# print(len_details)
-
+		
+		# it will put all the header name to fieldnames as list.
 		for i in range(len(len_details)):
 			fieldnames.append(list(len_details)[i])
 
+		# comma seperated values
 		header = ', '.join(fieldnames)
-		# print(header)
+		
 		column_value = []
 		for i in fieldnames:
 			column_value.append('{}'.format(json.dumps(details[i])))
 		column_value = ', '.join(column_value)
 
 		csv_file_name = "YoutubeLinkDetails.csv"
+		# assigning path of the csv file to save
 		file_path = "./csv/{}".format(csv_file_name)
 		if(os.path.exists(file_path)):
-			# append wala logic likhna h 
+			# 'a' mode is used to append into the file
 			with open(file_path, 'a') as fp: 
-				# 2) header 1st line m likhna h 
-				# fp.writelines(header)
+				
 				fp.writelines("\n{}".format(column_value))
 		else:
-			# 1) new file create karna h 
+			# 1) 'w' mode is used to write into the file
 			with open(file_path, 'w') as fp: 
-				# 2) header 1st line m likhna h 
+
+				# 2) write header in 1st line
 				fp.writelines(header)
 				fp.writelines("\n{}".format(column_value))
-				# 3) header k against m value dalna h
+				
 		save_data()
 	else:
 		logger.LogInfo("process complete done")
 
 
 save_data()
-
-
